@@ -25,6 +25,7 @@ if ( class_exists( 'WP_Importer' ) ) {
 			$this->import_page  = 'sp_player_csv';
 			$this->import_label = esc_attr__( 'Import Players', 'sportspress' );
 			$this->columns      = array(
+			    'sp_licenseno'   => esc_attr__( 'Lisans No', 'sportspress' ),
 				'sp_number'      => esc_attr__( 'Squad Number', 'sportspress' ),
 				'post_title'     => esc_attr__( 'Name', 'sportspress' ),
 				'sp_position'    => esc_attr__( 'Positions', 'sportspress' ),
@@ -56,7 +57,7 @@ if ( class_exists( 'WP_Importer' ) ) {
 			$rows = array_chunk( $array, sizeof( $columns ) );
 
 			// Get Date of Birth format from post vars
-			$date_format = ( empty( $_POST['sp_date_format'] ) ? 'yyyy/mm/dd' : sanitize_text_field( wp_unslash( $_POST['sp_date_format'] ) ) );
+			$date_format = ( empty( $_POST['sp_date_format'] ) ? 'dd/mm/yyyy' : sanitize_text_field( wp_unslash( $_POST['sp_date_format'] ) ) );
 
 			foreach ( $rows as $row ) :
 
@@ -102,9 +103,9 @@ if ( class_exists( 'WP_Importer' ) ) {
 							substr( str_pad( sp_array_value( $date_array, 1, '00' ), 2, '0', STR_PAD_LEFT ), 0, 2 );
 						break;
 					default:
-						$date = substr( str_pad( sp_array_value( $date_array, 0, '0000' ), 4, '0', STR_PAD_LEFT ), 0, 4 ) . '-' .
+						$date = substr( str_pad( sp_array_value( $date_array, 0, '00' ), 2, '0', STR_PAD_LEFT ), 0, 2 ).
 							substr( str_pad( sp_array_value( $date_array, 1, '00' ), 2, '0', STR_PAD_LEFT ), 0, 2 ) . '-' .
-							substr( str_pad( sp_array_value( $date_array, 2, '00' ), 2, '0', STR_PAD_LEFT ), 0, 2 );
+							substr( str_pad( sp_array_value( $date_array, 2, '0000' ), 4, '0', STR_PAD_LEFT ), 0, 4 ) . '-' ;
 				endswitch;
 
 				if ( ! $name ) :
@@ -145,6 +146,9 @@ if ( class_exists( 'WP_Importer' ) ) {
 					update_post_meta( $id, '_sp_import', 1 );
 				endif;
 
+				// Update licenseno
+				update_post_meta( $id, 'sp_licenseno', sp_array_value( $meta, 'sp_licenseno' ) );
+				
 				// Update number
 				update_post_meta( $id, 'sp_number', sp_array_value( $meta, 'sp_number' ) );
 
@@ -273,13 +277,13 @@ if ( class_exists( 'WP_Importer' ) ) {
 							<fieldset>
 								<ul>
 									<li>
-										<label><input name="sp_date_format" value="yyyy/mm/dd" type="radio" checked> yyyy/mm/dd</label>
+										<label><input name="sp_date_format" value="dd/mm/yyyy" type="radio" checked> dd/mm/yyyy</label>
 									</li>
 									<li>
 										<label><input name="sp_date_format" value="dd/mm/yyyy" type="radio"> dd/mm/yyyy</label>
 									</li>
 									<li>
-										<label><input name="sp_date_format" value="mm/dd/yyyy" type="radio"> mm/dd/yyyy</label>
+										<label><input name="sp_date_format" value="yyyy/mm/dd" type="radio"> yyyy/mm/dd</label>
 									</li>
 								</ul>
 							</fieldset>
